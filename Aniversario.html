@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Feliz Aniversario, Mi Chelita preciosa! 💖</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Paleta de colores de atardecer */
+        :root {
+            --sunset-bg: #fce4ec; 
+            --sunset-envelope: #fffaf0; 
+            --sunset-flap: #ffab91; 
+            --sunset-text-dark: #5d4037; 
+            --sunset-greeting: #ff8a65; 
+            --sunset-signature: #d84315; 
+            --sunset-heart: #ff7043; 
+            --sunset-closed-msg: #ffffff; 
+        }
+
+        /* Estilos Generales */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: var(--sunset-bg); 
+            font-family: 'Cormorant Garamond', serif; 
+            color: var(--sunset-text-dark); 
+            text-align: center;
+            padding: 20px;
+            overflow-x: hidden; 
+        }
+
+        /* Contenedor Principal (El Sobre/Carta) */
+        .envelope-container {
+            width: 90%;
+            max-width: 500px;
+            cursor: pointer;
+            perspective: 1000px; 
+            z-index: 10; 
+            position: relative;
+        }
+
+        /* Estilo del Sobre */
+        .envelope {
+            background-color: var(--sunset-envelope); 
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            padding: 30px;
+            transition: transform 1.5s ease;
+            transform-style: preserve-3d;
+            height: auto; 
+            min-height: 200px;
+        }
+
+        /* La Tapa del Sobre */
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 30%; 
+            background-color: var(--sunset-flap); 
+            border-radius: 10px 10px 0 0;
+            transform-origin: top;
+            transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out; 
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Al abrir el sobre, la tapa se vuelve transparente */
+        .envelope.open .envelope-flap {
+            transform: rotateX(180deg); 
+            opacity: 0; 
+        }
+
+        /* Contenido Oculto de la Carta */
+        .letter-content {
+            opacity: 0;
+            visibility: hidden; 
+            padding: 0;
+            transition: opacity 1.5s ease, visibility 0s 1.5s; 
+            text-align: left;
+            font-size: 1.2rem; 
+            line-height: 1.7;
+            font-weight: 400;
+        }
+        
+        /* Estilos al Abrir la Carta */
+        .envelope.open .letter-content {
+            opacity: 1;
+            visibility: visible;
+            padding: 30px 0 0 0; 
+            transition: opacity 1.5s ease, visibility 0s;
+        }
+
+        /* Mensaje de Cierre */
+        .signature {
+            display: block;
+            margin-top: 30px;
+            text-align: right;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--sunset-signature); 
+        }
+
+        .greeting {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--sunset-greeting); 
+        }
+
+        /* Texto inicial sobre el sobre cerrado */
+        .closed-message {
+            position: static; 
+            transform: none; 
+            font-size: 1.4rem; 
+            line-height: 1.2;
+            font-weight: bold;
+            color: var(--sunset-text-dark); /* CAMBIO: Color oscuro para que contraste con el salmón */
+            z-index: 1; 
+            transition: opacity 0.5s ease;
+            white-space: pre-wrap; 
+        }
+
+        .envelope.open .closed-message {
+            opacity: 0;
+        }
+
+        /* --- ESTILO DEL CORAZÓN DIBUJADO --- */
+        .hand-drawn-heart {
+            position: absolute;
+            top: 55%; /* Centra en la parte blanca (50% es el medio, lo bajamos un poco) */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%; /* Tamaño relativo al sobre */
+            max-width: 250px;
+            height: auto;
+            z-index: 1; 
+            transition: opacity 0.5s ease;
+        }
+        
+        /* Ocultar el corazón dibujado cuando el sobre se abre */
+        .envelope.open .hand-drawn-heart {
+            opacity: 0;
+        }
+
+        /* --- Estilos y Animaciones de Corazones Flotantes (sin cambios) --- */
+        .heart {
+            position: fixed;
+            font-size: 2rem;
+            color: var(--sunset-heart); 
+            animation: floatHeart 10s ease-in-out infinite;
+            opacity: 0; 
+            pointer-events: none; 
+            z-index: 5; 
+        }
+
+        @keyframes floatHeart {
+            0% { transform: translate(0, 0) scale(0); opacity: 0; }
+            10% { opacity: 0.8; transform: translate(var(--x-start), var(--y-start)) scale(0.8); }
+            80% { opacity: 0.6; transform: translate(var(--x-end), var(--y-end)) scale(1.2); }
+            100% { transform: translate(var(--x-end), var(--y-end)) scale(0); opacity: 0; }
+        }
+
+        /* Audio de Fondo Invisible, pero en loop */
+        #background-music {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="background-music" autoplay loop src="music.mp3"></audio>
+
+    <div class="envelope-container" onclick="openEnvelope()">
+        <div class="envelope" id="anniversary-envelope">
+            
+            <div class="envelope-flap">
+                <div class="closed-message" id="closed-msg">Abreme :) 💖</div>
+            </div>
+            
+            <img 
+                src="img.jpg" 
+                alt="Corazón dibujado a mano" 
+                class="hand-drawn-heart"
+            >
+            
+            <div class="letter-content" id="letter-text">
+                
+                <p class="greeting">Hola, buenos días mi vida, ¿cómo amaneciste, mi chelita preciosa? 💛</p>
+                
+                <p>Amor,<b>feliz aniversario</b>,mi princesa hermosa. Te amo infinitamente con todo mi corazón. Sé que te lo he dicho muchas veces, pero desde que llegaste a mi vida, soy la persona más feliz del mundo.</p>
+
+                <p>Te has convertido en mi motivación, en mi impulso para seguir adelante cada día. No tenés idea de lo <b>hermosa</b> que sos ante mis ojos. Sin duda alguna, siempre te llevo en mi corazón; ¿cómo no hacerlo?, si <b>sos lo más preciado que tengo</b></p>
+
+                <p><b>Te amo</b> y te voy a amar por siempre, porque lo que siento por vos no es algo pasajero: es algo que va <b>a vivir en mi corazón por el resto de mi vida.</b></p>
+                
+                <span class="signature">Feliz aniversario, mi chelita divina 💖.</span>
+               
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        function openEnvelope() {
+            const envelope = document.getElementById('anniversary-envelope');
+            envelope.classList.toggle('open');
+            
+            const closedMsg = document.getElementById('closed-msg');
+            const heartImg = document.querySelector('.hand-drawn-heart');
+            
+            if (envelope.classList.contains('open')) {
+                 setTimeout(() => {
+                    closedMsg.style.opacity = '0';
+                    if(heartImg) heartImg.style.opacity = '0'; // Ocultar imagen del corazón
+                 }, 500);
+                 startHeartAnimation(); 
+                 
+                 const music = document.getElementById('background-music');
+                 if (music && music.paused) {
+                    music.play().catch(error => {
+                        console.log('Autoplay de música de fondo bloqueado. La usuaria deberá tocar para iniciarla.');
+                    });
+                 }
+                 
+            } else {
+                 closedMsg.style.opacity = '1';
+                 if(heartImg) heartImg.style.opacity = '1'; // Mostrar imagen del corazón
+                 stopHeartAnimation(); 
+            }
+        }
+
+        // --- Lógica para Corazones Animados (sin cambios) ---
+        let heartInterval;
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '💖'; 
+            
+            const startX = Math.random() * window.innerWidth - (window.innerWidth / 2); 
+            const startY = window.innerHeight / 2 + Math.random() * 50; 
+            
+            const endX = startX + (Math.random() - 0.5) * 200; 
+            const endY = -window.innerHeight / 2 - Math.random() * 100; 
+
+            heart.style.left = '50%';
+            heart.style.top = '50%';
+            heart.style.setProperty('--x-start', `${startX}px`);
+            heart.style.setProperty('--y-start', `${startY}px`);
+            heart.style.setProperty('--x-end', `${endX}px`);
+            heart.style.setProperty('--y-end', `${endY}px`);
+            heart.style.animationDuration = `${7 + Math.random() * 5}s`; 
+            heart.style.animationDelay = `${Math.random() * 2}s`; 
+
+            document.body.appendChild(heart);
+
+            heart.addEventListener('animationend', () => {
+                heart.remove();
+            });
+        }
+
+        function startHeartAnimation() {
+            for (let i = 0; i < 5; i++) {
+                setTimeout(createHeart, Math.random() * 1000); 
+            }
+            heartInterval = setInterval(createHeart, 1500); 
+        }
+
+        function stopHeartAnimation() {
+            clearInterval(heartInterval);
+            document.querySelectorAll('.heart').forEach(heart => heart.remove());
+        }
+    </script>
+</body>
+</html>
